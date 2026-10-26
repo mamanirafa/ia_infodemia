@@ -67,9 +67,14 @@
   function paintSteps() {
     const el = $('#steps'); if (!el) return;
     const cur = ctrl().phase;
-    el.innerHTML = PHASES.map(p => `<button class="step ${p.id === VIEW ? 'sel' : ''} ${p.id === cur ? 'cur' : ''} ${unlocked(p.id) ? '' : 'lock'}" data-ph="${p.id}">${p.icon} ${esc(L(p.name))}</button>`).join('');
+    const html = PHASES.map(p => `<button class="step ${p.id === VIEW ? 'sel' : ''} ${p.id === cur ? 'cur' : ''} ${unlocked(p.id) ? '' : 'lock'}" data-ph="${p.id}">${p.icon} ${esc(L(p.name))}</button>`).join('');
+    if (el.dataset.html === html) return;          // sin cambios: no tocar nada
+    el.dataset.html = html;
+    el.innerHTML = html;
     $$('[data-ph]', el).forEach(b => b.onclick = () => { VIEW = b.dataset.ph; manual = VIEW !== ctrl().phase; render(true); });
-    const sel = $('.step.sel', el); if (sel && sel.scrollIntoView) sel.scrollIntoView({ block: 'nearest', inline: 'center' });
+    // Centrar la fase elegida SOLO en horizontal (nunca mover la página)
+    const sel = $('.step.sel', el);
+    if (sel) el.scrollLeft = sel.offsetLeft - (el.clientWidth - sel.offsetWidth) / 2;
   }
 
   /* ---------------- Fase 1: Registro ---------------- */
